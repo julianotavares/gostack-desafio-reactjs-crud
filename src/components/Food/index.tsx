@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { FiEdit3, FiTrash } from 'react-icons/fi';
 
 import { Container } from './styles';
+import api from '../../services/api';
 
 interface IFoodPlate {
   id: number;
@@ -26,13 +27,20 @@ const Food: React.FC<IProps> = ({
 }: IProps) => {
   const [isAvailable, setIsAvailable] = useState(food.available);
 
-  async function toggleAvailable(): Promise<void> {
-    // TODO UPDATE STATUS (available)
-  }
+  const toggleAvailable = useCallback(async () => {
+    const foodData = {
+      ...food,
+      available: !isAvailable,
+    };
 
-  function setEditingFood(): void {
-    // TODO - SET THE ID OF THE CURRENT ITEM TO THE EDITING FOOD AND OPEN MODAL
-  }
+    await api.put(`/foods/${food.id}`, foodData);
+
+    setIsAvailable(!isAvailable);
+  }, [food, isAvailable]);
+
+  const setEditingFood = useCallback(() => {
+    handleEditFood(food);
+  }, [handleEditFood, food]);
 
   return (
     <Container available={isAvailable}>
